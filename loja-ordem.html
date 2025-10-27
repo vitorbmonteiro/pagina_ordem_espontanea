@@ -1,4 +1,4 @@
-<!doctype html>
+!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -109,10 +109,10 @@
 
     /* Linha responsiva específica para o cupom */
     .coupon-row{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center }
-    .coupon-row .input{ min-width:0 } /* evita overflow do input no grid */
-    #applyCoupon{ white-space:nowrap; padding:12px 14px } /* botão compacto que não quebra */
+    .coupon-row .input{ min-width:0 }
+    #applyCoupon{ white-space:nowrap; padding:12px 14px }
     @media (max-width: 380px){
-      .coupon-row{ grid-template-columns:1fr } /* empilha em telas muito pequenas */
+      .coupon-row{ grid-template-columns:1fr }
       #applyCoupon{ width:100% }
     }
   </style>
@@ -123,8 +123,8 @@
     <div class="container">
       <div class="topbar">
         <a class="brand" href="#" aria-label="Página inicial">
-          <!-- Coloque logo-oe.png no repositório (raiz). Fundo ao redor é preto para integrar -->
-          <img id="logo" src="logo-oe.png" alt="Logo Ordem Espontânea">
+          <!-- Use a logo que está no repositório (raiz) -->
+          <img id="logo" src="logo-ordem.jpg" alt="Logo Ordem Espontânea">
           <div id="logoPh">LOGO</div>
           <h1>Loja — Ordem Espontânea</h1>
         </a>
@@ -288,7 +288,7 @@
           <div class="row" style="justify-content:space-between; align-items:end">
             <div>
               <div class="price">${BRL.format(p.price)}</div>
-              <div class="tags">${(p.tags||[]).map(t=>`<span class="note">${t}</span>`).join('')}</div>
+              <div class="tags">${(p.tags||[]).map(t=>`<span class=\"note\">${t}</span>`).join('')}</div>
             </div>
             <button class="btn" aria-label="Adicionar ${p.name} ao carrinho" onclick='addToCart("${p.id}")'>Adicionar</button>
           </div>
@@ -386,14 +386,14 @@
       if(!name || !email){ e.preventDefault(); alert('Preencha nome e e-mail.'); return; }
       const items = state.cart.map(i=>{ const p=getProd(i.id); return `<li>${i.qty}× ${p.name} — ${BRL.format(p.price*i.qty)}</li>`}).join('');
       const totalTxt = qs('#totals').innerText.split('\n').slice(-1)[0];
-      const html = `<!doctype html><meta charset="utf-8"><title>Pedido — Ordem Espontânea</title>
+      const html = `<!doctype html><meta charset=\"utf-8\"><title>Pedido — Ordem Espontânea</title>
         <style>body{font:16px/1.5 Montserrat,Arial; padding:24px; color:#111} h1{font:700 22px Montserrat} .note{color:#666}</style>
         <h1>Pedido — Ordem Espontânea</h1>
-        <p><strong>Cliente:</strong> ${name}<br><strong>E-mail:</strong> ${email}<br><span class="note">Gerado em ${new Date().toLocaleString('pt-BR')}</span></p>
+        <p><strong>Cliente:</strong> ${name}<br><strong>E-mail:</strong> ${email}<br><span class=\"note\">Gerado em ${new Date().toLocaleString('pt-BR')}</span></p>
         <ol>${items}</ol>
         <p><strong>${totalTxt}</strong></p>
         <p>Método: ${qs('#ckPay').value} • CEP: ${qs('#ckCep').value} • Endereço: ${qs('#ckAddr').value}<br>Obs.: ${qs('#ckObs').value||'-'}</p>
-        <hr><p class="note">Envie este arquivo por e-mail/WhatsApp para confirmar o pedido. Pagamentos reais exigem integração de gateway.</p>`;
+        <hr><p class=\"note\">Envie este arquivo por e-mail/WhatsApp para confirmar o pedido. Pagamentos reais exigem integração de gateway.</p>`;
       const blob = new Blob([html], {type:'text/html'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -413,6 +413,7 @@
   </script>
 </body>
 </html>
+
 
 
 
