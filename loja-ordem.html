@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loja — Ordem Espontânea</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Paleta (preto, cinza, prata, branco — nessa ordem) ===== */
+    :root{
+      --bg:#000000;          /* Preto predominante */
+      --paper:#161616;       /* Cinza escuro para cartões */
+      --brand:#C0C0C0;       /* Prata para acentos/botões */
+      --brand-2:#E0E0E0;     /* Cinza claro para detalhes */
+      --text:#FFFFFF;        /* Branco para textos principais */
+      --muted:#B0B0B0;       /* Cinza para textos auxiliares */
+      --border:#2A2A2A;      /* Bordas discretas */
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+
+    /* ===== Reset ===== */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height:1.45;
+    }
+    img{max-width:100%; display:block}
+    button{cursor:pointer; font:inherit}
+    a{color:inherit; text-decoration:none}
+
+    /* ===== Header ===== */
+    header{
+      position:sticky; top:0; z-index:50;
+      background:#000; /* fundo preto absoluto para integrar logo com transparência */
+      border-bottom:1px solid var(--border);
+    }
+    .container{max-width:1200px; margin:0 auto; padding:16px}
+
+    .topbar{display:flex; align-items:center; gap:16px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{width:44px; height:44px; object-fit:contain; border-radius:8px; background:#000}
+    .brand h1{font-family:"Gilda Display", serif; font-weight:600; font-size:22px; margin:0}
+
+    /* Espaço reservado para a logo no canto superior esquerdo */
+    #logo{ background:#000; width:44px; height:44px; }
+    #logoPh{ display:none; width:44px; height:44px; place-items:center; background:#000; border:1px solid var(--brand); color:var(--brand); font-weight:700; border-radius:8px; }
+
+    .searchbar{flex:1; display:flex; gap:8px; align-items:center}
+    .input{ flex:1; background:var(--paper); border:1px solid var(--border); border-radius:999px; padding:12px 16px; outline:none; color:var(--text); }
+    .btn{ border:0; padding:12px 16px; border-radius:12px; background:var(--brand); color:#000; font-weight:700; box-shadow:var(--shadow) }
+    .btn.ghost{ background:transparent; color:var(--brand); border:1px solid var(--brand) }
+
+    .pill{ padding:8px 12px; border-radius:999px; border:1px solid var(--border); background:var(--paper); font-size:14px; color:var(--text) }
+    .filters{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
+
+    /* ===== Grid ===== */
+    main .grid{ display:grid; gap:16px; grid-template-columns:repeat(12,1fr) }
+    @media (max-width: 1024px){ main .grid{ grid-template-columns:repeat(8,1fr) } }
+    @media (max-width: 720px){ main .grid{ grid-template-columns:repeat(4,1fr) } }
+
+    .sidebar{ grid-column: span 3; position:sticky; top:88px; align-self:start }
+    @media (max-width: 1024px){ .sidebar{ grid-column:1/-1; position:static; order:2 } }
+
+    .products{ grid-column: span 9 }
+    @media (max-width: 1024px){ .products{ grid-column:1/-1; order:1 } }
+
+    .card{ background:var(--paper); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow) }
+
+    /* ===== Cards de produto ===== */
+    .product{ display:flex; flex-direction:column; overflow:hidden }
+    .product .media{ aspect-ratio:4/3; background:#0E0E0E; display:grid; place-items:center }
+    .product .media img{ width:100%; height:100%; object-fit:cover }
+    .product .info{ padding:14px 14px 10px }
+    .product .title{ font-weight:600; margin:0 0 6px 0 }
+    .product .price{ color:var(--brand); font-weight:800 }
+    .product .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; color:var(--muted) }
+
+    .catalog{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px }
+    @media (max-width: 900px){ .catalog{ grid-template-columns:repeat(2,1fr) } }
+    @media (max-width: 600px){ .catalog{ grid-template-columns:1fr } }
+
+    /* ===== Carrinho (drawer) ===== */
+    .cart-toggle{ position:relative }
+    .badge{ position:absolute; top:-6px; right:-6px; background:var(--brand); color:#000; border-radius:999px; padding:2px 6px; font-size:12px; font-weight:800 }
+
+    .drawer{ position:fixed; inset:0 0 0 auto; width:min(420px, 100%); background:var(--paper); transform:translateX(110%); transition:transform .28s ease; box-shadow: -24px 0 60px rgba(0,0,0,.6); display:flex; flex-direction:column; z-index:80; border-left:1px solid var(--border) }
+    .drawer.open{ transform:translateX(0) }
+    .drawer header{ position:sticky; top:0; background:var(--paper) }
+    .drawer .content{ padding:16px; overflow:auto; display:flex; flex-direction:column; gap:12px }
+    .cart-line{ display:grid; grid-template-columns:64px 1fr auto; gap:12px; align-items:center; border:1px solid var(--border); border-radius:12px; padding:8px }
+    .qty{ display:flex; align-items:center; gap:8px }
+    .qty button{ width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:#1E1E1E; color:var(--text) }
+
+    .totals{ margin-top:4px; border-top:1px dashed var(--border); padding-top:12px; font-weight:600 }
+    .checkout{ display:flex; flex-direction:column; gap:8px }
+
+    /* ===== Footer ===== */
+    footer{ margin-top:32px; padding:24px 0; border-top:1px solid var(--border); color:var(--muted) }
+
+    /* ===== Utils ===== */
+    .row{ display:flex; align-items:center; gap:8px }
+    .space{ flex:1 }
+    .note{ font-size:13px; color:var(--muted) }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0 }
+
+    /* Linha responsiva específica para o cupom */
+    .coupon-row{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center }
+    .coupon-row .input{ min-width:0 } /* evita overflow do input no grid */
+    #applyCoupon{ white-space:nowrap; padding:12px 14px } /* botão compacto que não quebra */
+    @media (max-width: 380px){
+      .coupon-row{ grid-template-columns:1fr } /* empilha em telas muito pequenas */
+      #applyCoupon{ width:100% }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header>
+    <div class="container">
+      <div class="topbar">
+        <a class="brand" href="#" aria-label="Página inicial">
+          <!-- Coloque logo-oe.png no repositório (raiz). Fundo ao redor é preto para integrar -->
+          <img id="logo" src="logo-oe.png" alt="Logo Ordem Espontânea">
+          <div id="logoPh">LOGO</div>
+          <h1>Loja — Ordem Espontânea</h1>
+        </a>
+        <div class="searchbar" role="search">
+          <input id="q" class="input" type="search" placeholder="Buscar produtos (ex.: camisa, caneca, livro)" aria-label="Buscar produtos" />
+          <button class="btn ghost" id="clearSearch" title="Limpar busca" aria-label="Limpar busca">Limpar</button>
+        </div>
+        <button class="btn cart-toggle" id="openCart" aria-haspopup="dialog" aria-controls="cartDrawer">
+          Carrinho
+          <span class="badge" id="cartCount">0</span>
+        </button>
+      </div>
+      <div class="filters" aria-label="Filtros de categoria">
+        <button class="pill" data-filter="all">Tudo</button>
+        <button class="pill" data-filter="camisa">Camisas</button>
+        <button class="pill" data-filter="caneca">Canecas</button>
+        <button class="pill" data-filter="livro">Livros</button>
+        <button class="pill" data-filter="acessorio">Acessórios</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="container">
+    <div class="grid">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <section class="card" style="padding:16px">
+          <h3 style="margin:0 0 10px 0; font-size:18px">Sobre a Loja</h3>
+          <p class="note">Produtos oficiais do projeto de extensão <strong>Ordem Espontânea</strong>. Parte da receita pode ser destinada a ações acadêmicas e de extensão.</p>
+          <ul class="note">
+            <li>Pagamentos: PIX e Cartão (via gateway — integrar depois)</li>
+            <li>Envio: Correios / Retirada na FEAAC/UFC</li>
+            <li>Contato: loja@ordemespontanea.ufc.br</li>
+          </ul>
+        </section>
+        <section class="card" style="padding:16px; margin-top:12px">
+          <h3 style="margin:0 0 10px 0; font-size:18px">Cupom</h3>
+          <div class="coupon-row">
+            <input id="coupon" class="input" style="border-radius:12px" placeholder="Digite seu cupom"/>
+            <button class="btn ghost" id="applyCoupon">Aplicar</button>
+          </div>
+          <p class="note" style="margin-top:8px">Exemplos: <code>ALUNO10</code> (10%), <code>LANÇAMENTO5</code> (5%).</p>
+        </section>
+      </aside>
+
+      <!-- Catálogo -->
+      <section class="products">
+        <div id="catalog" class="catalog" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ===== Drawer do carrinho ===== -->
+  <aside class="drawer" id="cartDrawer" role="dialog" aria-labelledby="cartTitle" aria-modal="true">
+    <header class="row container" style="padding:12px 16px">
+      <h2 id="cartTitle" style="margin:6px 0">Seu carrinho</h2>
+      <div class="space"></div>
+      <button class="btn ghost" id="closeCart" aria-label="Fechar carrinho">Fechar</button>
+    </header>
+    <div class="content" id="cartLines"></div>
+    <div class="container" style="padding-bottom:16px">
+      <div class="totals" id="totals"></div>
+      <div class="checkout" style="margin-top:12px">
+        <button class="btn" id="btnCheckout">Finalizar Pedido</button>
+        <span class="note">Nenhum pagamento é processado neste protótipo. Integre com Mercado Pago, Pagar.me, Stripe etc.</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Modal de checkout simples ===== -->
+  <dialog id="checkoutModal" style="border:none; border-radius:18px; width:min(720px, 96%); padding:0">
+    <form method="dialog" class="card" style="padding:16px">
+      <div class="row">
+        <h3 style="margin:6px 0">Finalizar Pedido</h3>
+        <div class="space"></div>
+        <button class="btn ghost">Fechar</button>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:8px">
+        <label>Nome completo<br><input id="ckName" class="input" required></label>
+        <label>E-mail<br><input id="ckEmail" type="email" class="input" required></label>
+        <label>CEP<br><input id="ckCep" class="input" placeholder="60000-000" required></label>
+        <label>Endereço<br><input id="ckAddr" class="input" required></label>
+        <label>Forma de pagamento<br>
+          <select id="ckPay" class="input" style="appearance:auto">
+            <option>PIX</option>
+            <option>Cartão de Crédito</option>
+          </select></label>
+        <label>Observações<br><input id="ckObs" class="input" placeholder="ex.: Retirar na FEAAC"></label>
+      </div>
+      <div class="card" style="padding:12px; margin-top:12px">
+        <strong>Resumo:</strong>
+        <div id="summary" class="note" style="margin-top:6px"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="confirmOrder" value="confirm">Confirmar pedido (simulado)</button>
+        <button class="btn ghost" value="cancel">Cancelar</button>
+      </div>
+      <p class="note" style="margin-top:6px">Ao confirmar, um arquivo HTML com o resumo do pedido é baixado. Envie por e-mail/WhatsApp.</p>
+    </form>
+  </dialog>
+
+  <footer class="container">
+    <div class="row">
+      <span>© <span id="year"></span> Ordem Espontânea — Projeto de Extensão • FEAAC/UFC</span>
+      <div class="space"></div>
+      <a class="note" href="#" title="Política de Privacidade">Política</a>
+      <span class="note">•</span>
+      <a class="note" href="#" title="Termos de Uso">Termos</a>
+    </div>
+  </footer>
+
+  <script>
+    // ===== Utilidades =====
+    const BRL = new Intl.NumberFormat('pt-BR',{style:'currency', currency:'BRL'});
+    const qs = s => document.querySelector(s);
+    const qsa = s => [...document.querySelectorAll(s)];
+
+    // ===== Catálogo =====
+    const PRODUCTS = [
+      {id:'cam001', name:'Camisa OE — Ícone Pássaros', price:79.9, cat:'camisa', img:'https://picsum.photos/seed/camisa/800/600', tags:['100% algodão','Unissex','P ao GG']},
+      {id:'cam002', name:'Camisa OE — Livre Mercado', price:84.9, cat:'camisa', img:'https://picsum.photos/seed/mercado/800/600', tags:['Estampa silk','Dry-fit','P ao G']},
+      {id:'mug001', name:'Caneca OE — Preto Fosco 350ml', price:49.9, cat:'caneca', img:'https://picsum.photos/seed/caneca/800/600', tags:['Cerâmica','Pode ir ao micro-ondas']},
+      {id:'liv001', name:'Livro — Introdução ao Pensamento Liberal', price:59.9, cat:'livro', img:'https://picsum.photos/seed/livro/800/600', tags:['Capa comum','160 páginas']},
+      {id:'acc001', name:'Adesivo OE — 10x10cm', price:9.9, cat:'acessorio', img:'https://picsum.photos/seed/adesivo/800/600', tags:['Vinil resistente']},
+      {id:'acc002', name:'Ecobag OE — Algodão Cru', price:39.9, cat:'acessorio', img:'https://picsum.photos/seed/ecobag/800/600', tags:['Reutilizável','35x40cm']}
+    ];
+
+    // ===== Estado =====
+    let state = {
+      filter:'all',
+      query:'',
+      coupon:null,
+      cart: JSON.parse(localStorage.getItem('oe.cart')||'[]') // [{id, qty}]
+    };
+
+    const coupons = { 'ALUNO10': .10, 'LANÇAMENTO5': .05 };
+
+    // ===== Render catálogo =====
+    function renderCatalog(){
+      const wrap = qs('#catalog');
+      wrap.innerHTML = '';
+      const filtered = PRODUCTS.filter(p =>
+        (state.filter==='all' || p.cat===state.filter) &&
+        (state.query==='' || p.name.toLowerCase().includes(state.query))
+      );
+      if(!filtered.length){
+        wrap.innerHTML = `<div class="card" style="padding:18px">Nenhum produto encontrado.</div>`;
+        return;
+      }
+      filtered.forEach(p=> wrap.appendChild(ProductCard(p)) );
+    }
+
+    function ProductCard(p){
+      const el = document.createElement('article');
+      el.className = 'product card';
+      el.innerHTML = `
+        <div class="media"><img alt="${p.name}" src="${p.img}"></div>
+        <div class="info">
+          <h4 class="title">${p.name}</h4>
+          <div class="row" style="justify-content:space-between; align-items:end">
+            <div>
+              <div class="price">${BRL.format(p.price)}</div>
+              <div class="tags">${(p.tags||[]).map(t=>`<span class="note">${t}</span>`).join('')}</div>
+            </div>
+            <button class="btn" aria-label="Adicionar ${p.name} ao carrinho" onclick='addToCart("${p.id}")'>Adicionar</button>
+          </div>
+        </div>`;
+      return el;
+    }
+
+    // ===== Carrinho =====
+    function saveCart(){ localStorage.setItem('oe.cart', JSON.stringify(state.cart)); }
+    function cartCount(){ return state.cart.reduce((s,i)=>s+i.qty,0); }
+    function cartTotal(){ return state.cart.reduce((s,i)=> s + (getProd(i.id).price * i.qty), 0); }
+    function getProd(id){ return PRODUCTS.find(p=>p.id===id); }
+
+    function addToCart(id){
+      const found = state.cart.find(i=>i.id===id);
+      if(found) found.qty++; else state.cart.push({id, qty:1});
+      saveCart(); updateCartUI();
+      qs('#cartDrawer').classList.add('open');
+    }
+    function removeFromCart(id){ state.cart = state.cart.filter(i=>i.id!==id); saveCart(); updateCartUI(); }
+    function qtyPlus(id){ const it = state.cart.find(i=>i.id===id); if(it){ it.qty++; saveCart(); updateCartUI(); } }
+    function qtyMinus(id){ const it = state.cart.find(i=>i.id===id); if(it){ it.qty=Math.max(1, it.qty-1); saveCart(); updateCartUI(); } }
+
+    function updateCartUI(){
+      qs('#cartCount').textContent = cartCount();
+      const lines = qs('#cartLines');
+      lines.innerHTML = '';
+      if(!state.cart.length){ lines.innerHTML = `<div class="note">Seu carrinho está vazio.</div>`; qs('#totals').textContent=''; return; }
+      state.cart.forEach(({id, qty})=>{
+        const p = getProd(id);
+        const row = document.createElement('div');
+        row.className = 'cart-line';
+        row.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" style="width:64px; height:64px; object-fit:cover; border-radius:8px">
+          <div>
+            <div style="font-weight:600">${p.name}</div>
+            <div class="note">${BRL.format(p.price)} un.</div>
+          </div>
+          <div style="text-align:right">
+            <div class="qty" aria-label="Quantidade">
+              <button onclick='qtyMinus("${id}")' aria-label="Diminuir">−</button>
+              <strong>${qty}</strong>
+              <button onclick='qtyPlus("${id}")' aria-label="Aumentar">+</button>
+            </div>
+            <button class="btn ghost" style="margin-top:8px" onclick='removeFromCart("${id}")'>Remover</button>
+          </div>`;
+        lines.appendChild(row);
+      });
+      // Totais
+      const sub = cartTotal();
+      const disc = state.coupon ? sub * state.coupon.value : 0;
+      const ship = sub>0 ? 15 : 0; // frete simbólico
+      const grand = Math.max(0, sub - disc) + ship;
+      qs('#totals').innerHTML = `
+        <div class="row"><span>Subtotal</span><div class="space"></div><span>${BRL.format(sub)}</span></div>
+        <div class="row"><span>Descontos ${state.coupon?`(<code>${state.coupon.code}</code>)`:''}</span><div class="space"></div><span>− ${BRL.format(disc)}</span></div>
+        <div class="row"><span>Frete</span><div class="space"></div><span>${BRL.format(ship)}</span></div>
+        <div class="row" style="font-size:18px"><span>Total</span><div class="space"></div><span>${BRL.format(grand)}</span></div>`;
+    }
+
+    // ===== Eventos UI =====
+    qsa('.pill').forEach(b=> b.addEventListener('click', ()=>{ state.filter = b.dataset.filter; renderCatalog(); }));
+    qs('#q').addEventListener('input', e=>{ state.query = e.target.value.toLowerCase().trim(); renderCatalog(); });
+    qs('#clearSearch').addEventListener('click', ()=>{ state.query=''; qs('#q').value=''; renderCatalog(); });
+
+    qs('#applyCoupon').addEventListener('click', ()=>{
+      const code = qs('#coupon').value.trim().toUpperCase();
+      if(!code){ state.coupon=null; updateCartUI(); return; }
+      if(coupons[code]){ state.coupon = {code, value: coupons[code]}; alert(`Cupom aplicado: ${code}`); }
+      else { state.coupon = null; alert('Cupom inválido'); }
+      updateCartUI();
+    });
+
+    // Drawer do carrinho
+    qs('#openCart').addEventListener('click', ()=> qs('#cartDrawer').classList.add('open'));
+    qs('#closeCart').addEventListener('click', ()=> qs('#cartDrawer').classList.remove('open'));
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') qs('#cartDrawer').classList.remove('open') })
+
+    // Checkout (simulado)
+    qs('#btnCheckout').addEventListener('click', ()=>{
+      if(!state.cart.length){ alert('Seu carrinho está vazio.'); return; }
+      const m = qs('#checkoutModal');
+      const summary = state.cart.map(i=>{ const p=getProd(i.id); return `${i.qty}× ${p.name} — ${BRL.format(p.price*i.qty)}`}).join('<br>');
+      const totalLine = qs('#totals').innerText.split('\n').slice(-1)[0];
+      qs('#summary').innerHTML = summary + `<br><br><strong>${totalLine}</strong>`;
+      if(typeof m.showModal==='function') m.showModal(); else m.setAttribute('open','');
+    });
+
+    qs('#checkoutModal').addEventListener('close', ()=>{/* noop */});
+
+    qs('#confirmOrder').addEventListener('click', (e)=>{
+      // Gera HTML simples com o pedido para salvar/compartilhar
+      const name = qs('#ckName').value.trim();
+      const email = qs('#ckEmail').value.trim();
+      if(!name || !email){ e.preventDefault(); alert('Preencha nome e e-mail.'); return; }
+      const items = state.cart.map(i=>{ const p=getProd(i.id); return `<li>${i.qty}× ${p.name} — ${BRL.format(p.price*i.qty)}</li>`}).join('');
+      const totalTxt = qs('#totals').innerText.split('\n').slice(-1)[0];
+      const html = `<!doctype html><meta charset="utf-8"><title>Pedido — Ordem Espontânea</title>
+        <style>body{font:16px/1.5 Montserrat,Arial; padding:24px; color:#111} h1{font:700 22px Montserrat} .note{color:#666}</style>
+        <h1>Pedido — Ordem Espontânea</h1>
+        <p><strong>Cliente:</strong> ${name}<br><strong>E-mail:</strong> ${email}<br><span class="note">Gerado em ${new Date().toLocaleString('pt-BR')}</span></p>
+        <ol>${items}</ol>
+        <p><strong>${totalTxt}</strong></p>
+        <p>Método: ${qs('#ckPay').value} • CEP: ${qs('#ckCep').value} • Endereço: ${qs('#ckAddr').value}<br>Obs.: ${qs('#ckObs').value||'-'}</p>
+        <hr><p class="note">Envie este arquivo por e-mail/WhatsApp para confirmar o pedido. Pagamentos reais exigem integração de gateway.</p>`;
+      const blob = new Blob([html], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `pedido-oe-${Date.now()}.html`; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // Init
+    renderCatalog(); updateCartUI();
+    qs('#year').textContent = new Date().getFullYear();
+
+    // Fallback para logo ausente ou com erro
+    const logoEl = document.getElementById('logo');
+    const ph = document.getElementById('logoPh');
+    if (logoEl) {
+      logoEl.addEventListener('error', ()=>{ logoEl.style.display='none'; if(ph) ph.style.display='grid'; });
+    }
+  </script>
+</body>
+</html>
+
